@@ -33,8 +33,6 @@ public class BurgerParameterizedTest {
 
     @Mock
     private Bun bun;
-
-    @Spy
     private Burger burger;
 
     private List<Ingredient> ingredientMocks;
@@ -49,7 +47,7 @@ public class BurgerParameterizedTest {
 
     @Before
     public void setUp() {
-        burger = new Burger();
+        burger = Mockito.spy(new Burger());
         ingredientMocks = new ArrayList<>();
 
         when(bun.getName()).thenReturn(bunData.name);
@@ -146,7 +144,9 @@ public class BurgerParameterizedTest {
 
     @Test
     public void getReceiptReturnsExpectedValueTest() {
-        assertEquals("Рецепты отличаются", expectedReceipt, burger.getReceipt());
+        assertEquals("Рецепты отличаются",
+                expectedReceipt.replaceAll("\\R", "\n"),
+                burger.getReceipt().replaceAll("\\R", "\n"));
     }
 
     @Test
@@ -164,5 +164,19 @@ public class BurgerParameterizedTest {
         }
     }
 
+    @Test
+    public void getReceiptCallsIngredientGetNameOnceTest() {
+        burger.getReceipt();
 
+        for (Ingredient ing : ingredientMocks) {
+            verify(ing, times(1)).getName();
+        }
+    }
+
+    @Test
+    public void getReceiptCallsBurgerGetPriceOnceTest() {
+        burger.getReceipt();
+
+        verify(burger, times(1)).getPrice();
+    }
 }
