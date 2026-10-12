@@ -32,8 +32,8 @@ public class BurgerParameterizedTest {
 
     @Mock
     private Bun bun;
-    private Burger burger;
 
+    private Burger burger;
     private List<Ingredient> ingredientMocks;
 
     public BurgerParameterizedTest(BunData bunData, List<IngredientData> ingredientDataList,
