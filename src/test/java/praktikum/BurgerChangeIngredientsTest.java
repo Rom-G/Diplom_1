@@ -6,27 +6,37 @@ import java.util.List;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+import praktikum.dto.IngredientData;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 import static praktikum.IngredientType.FILLING;
 
+@RunWith(MockitoJUnitRunner.class)
 public class BurgerChangeIngredientsTest {
 
     private final int REMOVE_INDEX = 0;
     private final int NEW_INDEX = 2;
     private Burger burger;
-    List<Ingredient> ingredients;
+    List<Ingredient> ingredientMocks;
 
     @Before
     public void setUp() {
         burger = new Burger();
-        Ingredient cutlet = new Ingredient(FILLING, "cutlet", 100);
-        Ingredient dinosaur = new Ingredient(FILLING, "dinosaur", 200);
-        Ingredient sausage = new Ingredient(FILLING, "sausage", 300);
-        ingredients = List.of(cutlet, dinosaur, sausage);
+        ingredientMocks = new ArrayList<>();
+        List<IngredientData> ingredientDataList = List.of(
+                new IngredientData(FILLING, "cutlet", 100),
+                new IngredientData(FILLING, "dinosaur", 200),
+                new IngredientData(FILLING, "sausage", 300));
 
-        for (Ingredient ing : ingredients) {
-            burger.addIngredient(ing);
+        for (IngredientData ingData : ingredientDataList) {
+            Ingredient ingMock = Mockito.mock(Ingredient.class);
+            when(ingMock.getName()).thenReturn(ingData.name);
+            ingredientMocks.add(ingMock);
+            burger.addIngredient(ingMock);
         }
     }
 
@@ -35,7 +45,7 @@ public class BurgerChangeIngredientsTest {
         burger.removeIngredient(REMOVE_INDEX);
 
         assertEquals("Размер списка не совпадает с ожидаемым",
-                ingredients.size() - 1,
+                ingredientMocks.size() - 1,
                 burger.ingredients.size());
     }
 
@@ -43,19 +53,19 @@ public class BurgerChangeIngredientsTest {
     public void removeIngredientRemovesIngredientTest() {
         burger.removeIngredient(REMOVE_INDEX);
 
-        assertFalse("Ингредиент " + ingredients.get(REMOVE_INDEX).getName() + " не удалён",
-                burger.ingredients.contains(ingredients.get(REMOVE_INDEX)));
+        assertFalse("Ингредиент " + ingredientMocks.get(REMOVE_INDEX).getName() + " не удалён",
+                burger.ingredients.contains(ingredientMocks.get(REMOVE_INDEX)));
     }
 
     @Test
     public void removeIngredientShiftsTheRightElementTest() {
         Assume.assumeFalse("SKIPPED: удаляется последний ингредиент в списке",
-                REMOVE_INDEX == ingredients.size() - 1);
+                REMOVE_INDEX == ingredientMocks.size() - 1);
 
         burger.removeIngredient(REMOVE_INDEX);
 
         assertEquals("Ингредиент на месте удалённого не совпадает с ожидаемым",
-                ingredients.get(REMOVE_INDEX + 1),
+                ingredientMocks.get(REMOVE_INDEX + 1),
                 burger.ingredients.get(REMOVE_INDEX));
     }
 
@@ -64,7 +74,7 @@ public class BurgerChangeIngredientsTest {
         burger.moveIngredient(REMOVE_INDEX, NEW_INDEX);
 
         assertEquals("Ингредиент на новом месте не совпадает с ожидаемым",
-                ingredients.get(REMOVE_INDEX).getName(),
+                ingredientMocks.get(REMOVE_INDEX).getName(),
                 burger.ingredients.get(NEW_INDEX).getName());
     }
 
@@ -73,13 +83,13 @@ public class BurgerChangeIngredientsTest {
         burger.moveIngredient(REMOVE_INDEX, NEW_INDEX);
 
         assertEquals("Размер списка не совпадает с ожидаемым",
-                ingredients.size(),
+                ingredientMocks.size(),
                 burger.ingredients.size());
     }
 
     @Test
     public void moveIngredientShiftsNeighboringElementTest() {
-        List<Ingredient> expected = new ArrayList<>(ingredients);
+        List<Ingredient> expected = new ArrayList<>(ingredientMocks);
         Ingredient moved = expected.remove(REMOVE_INDEX);
         expected.add(NEW_INDEX, moved);
 
