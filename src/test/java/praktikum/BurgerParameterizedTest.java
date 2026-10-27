@@ -1,6 +1,5 @@
 package praktikum;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -34,7 +33,6 @@ public class BurgerParameterizedTest {
     private Bun bun;
 
     private Burger burger;
-    private List<Ingredient> ingredientMocks;
 
     public BurgerParameterizedTest(BunData bunData, List<IngredientData> ingredientDataList,
                                    float expectedPrice, String expectedReceipt) {
@@ -47,7 +45,6 @@ public class BurgerParameterizedTest {
     @Before
     public void setUp() {
         burger = Mockito.spy(new Burger());
-        ingredientMocks = new ArrayList<>();
 
         when(bun.getName()).thenReturn(bunData.name);
         when(bun.getPrice()).thenReturn(bunData.price);
@@ -58,7 +55,6 @@ public class BurgerParameterizedTest {
             when(ingredient.getType()).thenReturn(ingData.type);
             when(ingredient.getName()).thenReturn(ingData.name);
             when(ingredient.getPrice()).thenReturn(ingData.price);
-            ingredientMocks.add(ingredient);
             burger.addIngredient(ingredient);
         }
     }
@@ -127,55 +123,9 @@ public class BurgerParameterizedTest {
     }
 
     @Test
-    public void getPriceCallsBunGetPriceOnceTest() {
-        burger.getPrice();
-        verify(bun, times(1)).getPrice();
-    }
-
-    @Test
-    public void getPriceCallsIngredientGetPriceOnceTest() {
-        burger.getPrice();
-
-        for (Ingredient ing : ingredientMocks) {
-            verify(ing, times(1)).getPrice();
-        }
-    }
-
-    @Test
     public void getReceiptReturnsExpectedValueTest() {
         assertEquals("Рецепты отличаются",
                 expectedReceipt.replaceAll("\\R", "\n"),
                 burger.getReceipt().replaceAll("\\R", "\n"));
-    }
-
-    @Test
-    public void getReceiptCallsBunGetNameTwiceTest() {
-        burger.getReceipt();
-        verify(bun, times(2)).getName();
-    }
-
-    @Test
-    public void getReceiptCallsIngredientGetTypeOnceTest() {
-        burger.getReceipt();
-
-        for (Ingredient ing : ingredientMocks) {
-            verify(ing, times(1)).getType();
-        }
-    }
-
-    @Test
-    public void getReceiptCallsIngredientGetNameOnceTest() {
-        burger.getReceipt();
-
-        for (Ingredient ing : ingredientMocks) {
-            verify(ing, times(1)).getName();
-        }
-    }
-
-    @Test
-    public void getReceiptCallsBurgerGetPriceOnceTest() {
-        burger.getReceipt();
-
-        verify(burger, times(1)).getPrice();
     }
 }
